@@ -1,4 +1,4 @@
-package edu.txstate.cyberflix.data.db;
+package edu.txstate.cs3320.toman.weaver.data.db;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import edu.txstate.cyberflix.data.film.Film;
-import edu.txstate.cyberflix.data.film.FilmCategory;
-import edu.txstate.cyberflix.data.film.Film.FilmRating;
-import edu.txstate.cyberflix.data.helper.FilmFactory;
+import edu.txstate.cs3320.toman.weaver.data.film.Film;
+import edu.txstate.cs3320.toman.weaver.data.film.FilmCategory;
+import edu.txstate.cs3320.toman.weaver.data.film.Film.FilmRating;
+import edu.txstate.cs3320.toman.weaver.data.helper.FilmFactory;
 
 /**
  * @author Two
@@ -27,10 +27,99 @@ public class FilmDAO extends DAO {
 	private static final int    FILM_RATING_COLUMN      = 5;
 	private static final int    FILM_RELEASE_YEAR       = 6;
 	
+	private String character;
 	private static final String FILM_SELECT_STRING      = "SELECT film.film_id, film.title, film.description," +
 			"film.length, film.rating, film.release_year ";
 	
+	private final String SELECT_ALPHA = String.format("SELECT film_id, title, description, release_year, length, rating  FROM film WHERE title LIKE ‘%s%’;", character);
 
+	private final String CATEGORY_CLAUSES = " FROM film, film_category WHERE film.film_id = film_category.film_id AND film_category.category_id =";
+	
+	/**
+	 * Contributer: Kimberley
+	 * @param category of movie
+	 * @return
+	 */
+	public List <Film> findFilmsByCategory(FilmCategory category){
+		StringBuilder stringBuilder = new StringBuilder(FILM_SELECT_STRING);
+		stringBuilder.append(CATEGORY_CLAUSES);
+		stringBuilder.append(category.ordinal() + ";");
+		String selectString = stringBuilder.toString();
+		List <Film> films = null;
+		Connection dbConnection = null;
+		try {
+			dbConnection = DAO.getDBConnection();
+			Statement statement 	= dbConnection.createStatement();
+			ResultSet results       = statement.executeQuery(selectString);
+			films = buildResults (results);
+			dbConnection.close();
+		} catch (SQLException e) {
+			System.err.println("FilmDAO.findFilmsByAttributes: " + e.toString());
+			LOGGER.severe(e.toString());
+			closeQuietly(dbConnection);
+		}	
+		return films;
+	}
+	
+	/**
+	 * Contributer: Kimberley
+	 * @param firstCharacter of film to search alphabetically
+	 * @return
+	 */
+	public List <Film> findFilmsAlphabetically(String firstCharacter){
+		character = firstCharacter; //must be instantiated prior to using ALPHA
+		List <Film> films = null;
+		Connection dbConnection = null;
+		try {
+			dbConnection = DAO.getDBConnection();
+			Statement statement 	= dbConnection.createStatement();
+			ResultSet results       = statement.executeQuery(SELECT_ALPHA);
+			films = buildResults (results);
+			dbConnection.close();
+		} catch (SQLException e) {
+			System.err.println("FilmDAO.findFilmsByAttributes: " + e.toString());
+			LOGGER.severe(e.toString());
+			closeQuietly(dbConnection);
+		}	
+		return films;
+	}
+	
+	/**
+	 * Contributer: Kimberley
+	 * @param film
+	 * @return
+	 */
+	public Film getFilmDetail(Film film){
+		ActorDAO actDao = new ActorDAO();
+		film.setActors(actDao.findActorsFromFilm(film));
+		getFilmCategory(film);
+		return film;
+	}
+	
+	/**
+	 * Contributer: Kimberley
+	 * @param film
+	 * @return
+	 */
+	public String getFilmCategory(Film film){
+		String select = String.format("SELECT film_category.category_id FROM film_category WHERE film_id = %d", film.getFilmID());
+		Connection dbConnection = null;
+		int cat_id = -1;
+		try {
+			dbConnection = DAO.getDBConnection();
+			Statement statement 	= dbConnection.createStatement();
+			ResultSet results       = statement.executeQuery(select);
+			cat_id              =  results.getInt(1);
+			dbConnection.close();
+		} catch (SQLException e) {
+			System.err.println("FilmDAO.findFilmsByAttributes: " + e.toString());
+			LOGGER.severe(e.toString());
+			closeQuietly(dbConnection);
+		}
+		
+		film.setCategory(FilmCategory.values()[cat_id]);
+		return film.getCategory();
+	}
 	
 	public List <Film> findFilmsByAttributes (String title, String description, int length, FilmRating rating) {
 		String selectString = buildString (title, description, length, rating);
@@ -75,6 +164,7 @@ public class FilmDAO extends DAO {
 		int numberWhereClauses = 0;
 		StringBuilder stringBuilder = new StringBuilder(FILM_SELECT_STRING);
 		stringBuilder.append(" FROM ").append(getDBName()).append(".film").append(" WHERE ");
+		
 		
 		// create the clause to select any movie that contains titleSubstring in its title
 		if ((titleSubstring != null) && (titleSubstring != "")) {

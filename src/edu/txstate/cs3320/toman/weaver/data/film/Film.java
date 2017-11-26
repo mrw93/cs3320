@@ -2,7 +2,7 @@ package edu.txstate.cs3320.toman.weaver.data.film;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import edu.txstate.cs3320.toman.weaver.data.film.FilmCategory;
 import edu.txstate.cs3320.toman.weaver.data.actor.Actor;
 
 public class Film {
@@ -18,6 +18,7 @@ public class Film {
 	private FilmRating rating;
 	private List <Actor> actors;
 	private String link;
+	private String category;
 	public Film(int filmID, String title, String description,
 			String releaseYear, int length, FilmRating rating) {
 		super();
@@ -28,6 +29,36 @@ public class Film {
 		this.length = length;
 		this.rating = rating;
 		this.actors = new ArrayList <Actor> ();
+	}
+	
+	public void setActors(List<Actor> actors){
+		this.actors = actors;
+	}
+	
+	public void setCategory(FilmCategory cat){
+		switch(cat){
+		case ACTION: this.category = "ACTION";
+		case ANIMATION: this.category = "ANIMATION";
+		case CHILDREN: this.category = "CHILDREN";
+		case CLASSICS: this.category = "CLASSICS";
+		case COMEDY: this.category = "COMEDY";
+		case DOCUMENTARY: this.category = "DOCUMENTARY";
+		case DRAMA: this.category = "DRAMA";
+		case FAMILY: this.category = "FAMILY";
+		case FOREIGN: this.category = "FOREIGN";
+		case GAMES: this.category = "GAMES";
+		case HORROR: this.category = "HORROR";
+		case MUSIC: this.category = "MUSIC";
+		case NEW: this.category = "NEW";
+		case SCI_FI: this.category = "SCIFI";
+		case SPORTS: this.category = "SPORTS";
+		case TRAVEL: this.category = "TRAVEL";
+		default: this.category = "";
+		}
+	}
+	
+	public String getCategory(){
+		return this.category;
 	}
 	public void setLink(String link){
 		this.link = link;

@@ -7,10 +7,10 @@ public class FilmFactory {
 	public FilmFactory () {	
 	}
 
-	public Film makeFilm (String filmID, String title, String description,
-			String releaseYear, String length, String rating) {
-		int id = Integer.valueOf(filmID);
-		int filmLength = Integer.valueOf(length);
+	public Film makeFilm (int id2, String title, String description,
+			String releaseYear, int filmLength2, String rating) {
+		int id = Integer.valueOf(id2);
+		int filmLength = Integer.valueOf(filmLength2);
 		return new Film (id, title, description, releaseYear, filmLength, FilmFactory.convert(rating));
 	}
 	
