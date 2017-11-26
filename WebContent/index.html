@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="stylesheet.css">
+<meta charset="ISO-8859-1">
+<title>CyberFlix</title>
+</head>
+<body>
+<div style="height: 150px">
+<button>Home</button><button>Rent</button><button>Login</button><button>Support</button><img style="float: right; width: 150px; height: 150px; box-shadow: none" src="images/logo.png"/><br>
+<h1> Welcome to CyberFlix!</h1>
+<h2> Let's Find You a Movie! </h2>
+</div>
+<p>
+<p>
+
+<div class="search">
+<form action="http://localhost:8080/CyberFlix0/CyberFlixServlet" method="get">
+  Title: <input type="text" name="film_title">
+  <hr>
+  Description: <input type="text" name="film_title">
+  <hr>
+  Rating: <input type="text" name="film_title">
+  <hr>
+  Running Time:<br>
+      <input type="radio" id="30"
+     name="30" value="time">
+    <label for="30">30</label>
+          <input type="radio" id="60"
+     name="60" value="time">
+    <label for="60">60</label>
+          <input type="radio" id="90"
+     name="90" value="time">
+    <label for="90">90</label>
+          <input type="radio" id="120"
+     name="120" value="time">
+    <label for="120">120</label>
+          <input type="radio" id="1200"
+     name="1200" value="time">
+    <label for="1200">120+</label>
+    <hr>
+  <input class="button" type="submit" value="Search">
+</form>
+</div>
+
+</body>
+</html>
