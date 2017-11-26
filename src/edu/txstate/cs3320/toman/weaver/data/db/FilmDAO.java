@@ -35,7 +35,35 @@ public class FilmDAO extends DAO {
 
 	private final String CATEGORY_CLAUSES = " FROM film, film_category WHERE film.film_id = film_category.film_id AND film_category.category_id =";
 	
+	private final String SPLASH_PAGE = "order by release_year desc;";
+	
 	/**
+	 * Use Case 1
+	 * Contributer: Kimberley
+	 * @param maxNew
+	 * @return
+	 */
+	public List <Film> findNewestFilms (int maxNew) {
+		StringBuilder stringBuilder = new StringBuilder(FILM_SELECT_STRING + SPLASH_PAGE);
+		String selectString = stringBuilder.toString();
+		List <Film> films = null;
+		Connection dbConnection = null;
+		try {
+			dbConnection = DAO.getDBConnection();
+			Statement statement 	= dbConnection.createStatement();
+			ResultSet results       = statement.executeQuery(selectString);
+			films = buildSplash(results, maxNew);
+			dbConnection.close();
+		} catch (SQLException e) {
+			System.err.println("FilmDAO.findFilmsByAttributes: " + e.toString());
+			LOGGER.severe(e.toString());
+			closeQuietly(dbConnection);
+		}	
+		return films;
+	}
+
+	/**
+	 * Use Case 3
 	 * Contributer: Kimberley
 	 * @param category of movie
 	 * @return
@@ -62,6 +90,7 @@ public class FilmDAO extends DAO {
 	}
 	
 	/**
+	 * Use Case 4
 	 * Contributer: Kimberley
 	 * @param firstCharacter of film to search alphabetically
 	 * @return
@@ -85,6 +114,7 @@ public class FilmDAO extends DAO {
 	}
 	
 	/**
+	 * Use Case 5
 	 * Contributer: Kimberley
 	 * @param film
 	 * @return
@@ -97,6 +127,7 @@ public class FilmDAO extends DAO {
 	}
 	
 	/**
+	 * Use Case 5 (part of)
 	 * Contributer: Kimberley
 	 * @param film
 	 * @return
@@ -121,6 +152,15 @@ public class FilmDAO extends DAO {
 		return film.getCategory();
 	}
 	
+	/**
+	 * Use Case 2
+	 * Author: Professor
+	 * @param title film title
+	 * @param description film description
+	 * @param length film length
+	 * @param rating film rating
+	 * @return films meeting given criteria 
+	 */
 	public List <Film> findFilmsByAttributes (String title, String description, int length, FilmRating rating) {
 		String selectString = buildString (title, description, length, rating);
 		List <Film> films = null;
@@ -211,6 +251,35 @@ public class FilmDAO extends DAO {
 		String selectString = stringBuilder.toString();
 		LOGGER.info(selectString);
 		return selectString;
+	}
+	
+	/**
+	 * Builds splash page
+	 * This is repeated code. I need to change this before submitting - Kimberley
+	 * @param results
+	 * @param max
+	 * @return
+	 */
+	private List<Film> buildSplash(ResultSet results, int max) {
+		ArrayList <Film> films  = new ArrayList <Film> ();
+		FilmFactory filmFactory = new FilmFactory ();
+		try {
+			int i = 0;
+			while (results.next() && i < max) {
+				int    id             =  results.getInt   (FILM_ID_COLUMN );
+				String filmTitle       = results.getString(FILM_TITLE_COLUMN );
+				String filmDescription = results.getString(FILM_DESCRIPTION_COLUMN);
+				int    filmLength      = results.getInt   (FILM_LENGTH_COLUMN);
+				String filmRating      = results.getString(FILM_RATING_COLUMN);
+				String release_year    = results.getString(FILM_RELEASE_YEAR);
+				Film film = filmFactory.makeFilm(id, filmTitle, filmDescription, release_year, filmLength, filmRating);
+				films.add(film);
+				i++;
+			}
+		} catch (SQLException e) {
+			LOGGER.severe(e.toString());
+		}
+		return films;
 	}
 
 	private List<Film> buildResults (ResultSet results) {
