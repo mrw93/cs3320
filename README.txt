@@ -1,5 +1,5 @@
-Authors: Kimberley Toman and Mark Weaver
-Project: Assignment 6
+Authors: Kimberley Toman, Mark Weaver, Douglas Pitt, and Kyle Greer
+Project: Assignment 8
 
 To Run:
 Open Eclipse -> import -> Open project into workspace
